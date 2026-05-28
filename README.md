@@ -3,7 +3,6 @@
 ## Deskripsi
 Repository ini berisi seluruh pipeline data untuk proyek FomOff
 sebagai bagian dari Coding Camp 2026 powered by DBS Foundation.
-Tim ID: CC26-PSU256
 
 ## Struktur Repository
 **data/processed/** — Dataset hasil olahan
