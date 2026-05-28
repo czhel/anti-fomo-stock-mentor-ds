@@ -5,3 +5,6 @@ seaborn
 scipy
 statsmodels
 ta
+streamlit
+plotly 
+scipy

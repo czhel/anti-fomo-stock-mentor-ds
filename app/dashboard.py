@@ -118,25 +118,25 @@ st.markdown("""
 # ─── LOAD DATA ─────────────────────────────────────────────────────
 @st.cache_data
 def load_saham():
-    df = pd.read_csv('../data/cleaned_stock_data.csv',
+    df = pd.read_csv('../data/processed/cleaned_stock_data.csv',
                      parse_dates=['Last Trading Date'])
     return df
 
 @st.cache_data
 def load_grup_a():
-    df = pd.read_csv('../data/ab_testing_grup_a.csv',
+    df = pd.read_csv('../data/processed/ab_testing_grup_a.csv',
                      parse_dates=['Last Trading Date'])
     return df
 
 @st.cache_data
 def load_grup_b():
-    df = pd.read_csv('../data/ab_testing_grup_b.csv',
+    df = pd.read_csv('../data/processed/ab_testing_grup_b.csv',
                      parse_dates=['Last Trading Date'])
     return df
 
 @st.cache_data
 def load_berita():
-    df = pd.read_csv('../data/dataset_berita.csv')
+    df = pd.read_csv('../data/processed/dataset_berita.csv')
     return df
 
 # Load semua data
