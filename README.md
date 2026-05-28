@@ -5,11 +5,11 @@ Repository ini berisi seluruh pipeline data untuk proyek FomOff
 sebagai bagian dari Coding Camp 2026 powered by DBS Foundation.
 
 ## Struktur Repository
-**data/processed/** — Dataset hasil olahan
+**data/processed** — Dataset hasil olahan
 
-**notebooks/** — Notebook analisis dan script A/B Testing
+**notebooks** — Notebook analisis dan script A/B Testing
 
-**app/** — Streamlit dashboard
+**app** — Streamlit dashboard
 
 **README.md** — Dokumentasi proyek
 
