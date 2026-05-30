@@ -9,10 +9,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
-    page_title="Anti FOMO Stock Mentor",
+    page_title="INVESTSENSE AI",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded"   # tetap expanded awal
 )
 
 st.markdown("""
@@ -23,7 +23,23 @@ html, body, [class*="css"] {
     font-family: 'DM Sans', sans-serif;
 }
 
-#MainMenu, footer, header { visibility: hidden; }
+/* Sembunyikan menu utama dan footer */
+#MainMenu, footer { visibility: hidden; }
+
+/* MENYEMBUNYIKAN IKON ANCHOR LINK (RANTAI) AGAR URL TIDAK MACET */
+h1 a, h2 a, h3 a {
+    display: none !important;
+}
+
+/* =========================================================
+   STYLING HALAMAN UTAMA (DIUBAH JADI PUTIH)
+   ========================================================= */
+[data-testid="stAppViewContainer"] {
+    background-color: #ffffff !important;
+}
+[data-testid="stMain"] {
+    background-color: #ffffff !important;
+}
 
 .block-container {
     padding-top: 2rem !important;
@@ -70,12 +86,15 @@ h2, h3 {
     font-weight: 500 !important;
 }
 
+/* =========================================================
+   STYLING SIDEBAR (DIUBAH JADI HITAM & NAVIGASI ELEGAN)
+   ========================================================= */
 [data-testid="stSidebar"] {
-    background: #0f172a !important;
-    border-right: 1px solid #1e293b;
+    background: #000000 !important;
+    border-right: 1px solid #262626;
 }
 [data-testid="stSidebar"] * {
-    color: #94a3b8 !important;
+    color: #ffffff !important;
 }
 
 [data-testid="stSidebar"] .stRadio > div {
@@ -84,24 +103,24 @@ h2, h3 {
 [data-testid="stSidebar"] .stRadio label {
     display: flex !important;
     align-items: center !important;
+    width: 100% !important; 
     padding: 10px 14px !important;
     border-radius: 8px !important;
     font-size: 0.875rem !important;
     font-weight: 500 !important;
-    color: #94a3b8 !important;
+    color: #e5e5e5 !important;
     cursor: pointer !important;
     transition: all 0.15s ease !important;
-    border: 1px solid transparent !important;
 }
+/* Efek hover item navigasi di latar belakang hitam */
 [data-testid="stSidebar"] .stRadio label:hover {
-    background: #1e293b !important;
-    color: #e2e8f0 !important;
-    border-color: #334155 !important;
+    background: #262626 !important;
+    color: #ffffff !important;
 }
 
 hr {
     border: none !important;
-    border-top: 1px solid #f1f5f9 !important;
+    border-top: 1px solid #e2e8f0 !important;
     margin: 1.5rem 0 !important;
 }
 
@@ -119,7 +138,7 @@ hr {
     font-size: 0.85rem;
     line-height: 1.6;
 }
-.box-blue   { background:#eff6ff; border-left:3px solid #3b82f6; color:#1e40af; }
+.box-blue   { background:#f8fafc; border-left:3px solid #3b82f6; color:#1e40af; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; }
 .box-green  { background:#f0fdf4; border-left:3px solid #22c55e; color:#166534; }
 .box-yellow { background:#fefce8; border-left:3px solid #eab308; color:#854d0e; }
 .box-red    { background:#fef2f2; border-left:3px solid #ef4444; color:#991b1b; }
@@ -131,7 +150,7 @@ hr {
 }
 
 .stCaption p {
-    color: #cbd5e1 !important;
+    color: #94a3b8 !important;
     font-size: 0.75rem !important;
 }
 </style>
@@ -157,7 +176,28 @@ PLOTLY_LAYOUT = dict(
                linecolor='#e2e8f0', tickfont=dict(size=11))
 )
 
-# Sesuaikan path CSV dengan lokasi file kamu
+SIGNAL_ORDER = [
+    'Strong Buy',
+    'Buy',
+    'Hold',
+    'Sell',
+    'Strong Sell'
+]
+
+SIGNAL_COLORS = {
+    'Strong Buy': '#166534',
+    'Buy': '#22c55e',
+    'Hold': '#94a3b8',
+    'Sell': '#ef4444',
+    'Strong Sell': '#7f1d1d'
+}
+
+SENTIMENT_COLORS = {
+    'positif': '#22c55e',
+    'netral': '#94a3b8',
+    'negatif': '#ef4444'
+}
+
 @st.cache_data
 def load_saham():
     return pd.read_csv(
@@ -193,54 +233,64 @@ try:
 except Exception:
     berita_loaded = False
 
-# Nama halaman TANPA emoji agar if/elif tidak salah cocok
 HALAMAN_EDA      = "EDA Dataset Saham"
 HALAMAN_SENTIMEN = "Distribusi Sentimen Berita"
 HALAMAN_AB       = "Hasil A/B Testing"
 
+# --- LOGIK SINKRONISASI URL QUERY PARAMS ---
+if "page" in st.query_params:
+    halaman_saat_ini = st.query_params["page"]
+    daftar_opsi = [HALAMAN_EDA, HALAMAN_SENTIMEN, HALAMAN_AB]
+    idx_default = daftar_opsi.index(halaman_saat_ini) if halaman_saat_ini in daftar_opsi else 0
+else:
+    idx_default = 0
+
 with st.sidebar:
     st.markdown("""
-    <div style='padding: 24px 8px 20px; 
-                border-bottom: 1px solid #1e293b; 
+    <div style='font-family: "DM Mono", monospace; 
+                font-size: 1.35rem; 
+                font-weight: 500; 
+                letter-spacing: 0.15em; 
+                color: #ffffff; 
+                text-align: center; 
+                padding: 15px 0 5px 0;'>
+        INVESTSENSE AI
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style='padding: 0px 8px 20px; 
+                border-bottom: 1px solid #262626; 
                 margin-bottom: 8px'>
-        <div style='font-family: DM Mono, monospace; 
-                    font-size: 1rem; font-weight: 500; 
-                    color: #f1f5f9; line-height: 1.5'>
-            Anti FOMO<br>Stock Mentor
-        </div>
-        <div style='font-size: 0.65rem; color: #475569;
+        <div style='font-size: 0.65rem; color: #a3a3a3;
                     margin-top: 6px; letter-spacing: 0.06em;
-                    text-transform: uppercase'>
+                    text-transform: uppercase; text-align: center;'>
             Data Science Dashboard
         </div>
-        <div style='font-size: 0.6rem; color: #334155; 
-                    margin-top: 2px'>
+        <div style='font-size: 0.6rem; color: #525252; 
+                    margin-top: 2px; text-align: center;'>
             CC26-PSU256
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style='padding: 14px 8px 4px; font-size: 0.6rem;
-                color: #475569; letter-spacing: 0.08em; 
-                text-transform: uppercase'>
-        Navigation
-    </div>
-    """, unsafe_allow_html=True)
-
     halaman = st.radio(
-        "nav",
+        label="Navigasi", 
         options=[HALAMAN_EDA, HALAMAN_SENTIMEN, HALAMAN_AB],
-        label_visibility="collapsed",
-        key="navigasi_utama"
+        index=idx_default, # Menggunakan index default dari URL
+        key="navigasi_utama",
+        label_visibility="collapsed" 
     )
+
+    # Simpan halaman terbaru ke parameter URL browser setiap ada perubahan click
+    st.query_params["page"] = halaman
 
     st.markdown("""
     <div style='margin-top: 32px; padding-top: 16px;
-                border-top: 1px solid #1e293b'>
-        <div style='font-size: 0.65rem; color: #334155; 
+                border-top: 1px solid #262626'>
+        <div style='font-size: 0.65rem; color: #a3a3a3; 
                     text-align: center; line-height: 1.6'>
-            Coding Camp 2026<br>powered by DBS Foundation
+            Coding Camp 2026<br><span style='color:#737373'>powered by DBS Foundation</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -250,7 +300,7 @@ if halaman == HALAMAN_EDA:
     st.title("EDA Dataset Saham IDX")
     st.markdown(
         "Eksplorasi data saham IDX periode **September 2022 – Oktober 2023** "
-        "sebagai dasar analisis teknikal proyek Anti FOMO Stock Mentor."
+        "sebagai dasar analisis teknikal proyek INVESTSENSE AI."
     )
     st.markdown("---")
 
@@ -262,7 +312,6 @@ if halaman == HALAMAN_EDA:
 
     st.markdown("---")
 
-    # ── Grafik 1: Pergerakan Harga ────────────────────────────────
     st.subheader("Pergerakan Harga Saham")
     st.markdown(
         "Ketik atau pilih kode saham untuk melihat grafik "
@@ -323,15 +372,12 @@ if halaman == HALAMAN_EDA:
 
     st.markdown("""
     <div class='box box-blue'>
-    <b>Cara membaca grafik:</b> Segitiga hijau menandakan sinyal beli 
-    (Golden Cross), segitiga merah menandakan sinyal jual (Death Cross). 
-    MA5 dan MA20 menunjukkan rata-rata pergerakan harga 5 dan 20 hari terakhir.
+    <b>Cara membaca grafik:</b> Sinyal beli ditunjukkan oleh segitiga hijau (Golden Cross), sedangkan sinyal jual oleh segitiga merah (Death Cross). Lintasan MA5 dan MA20 menggambarkan rata-rata pergerakan harga 5 dan 20 hari terakhir.
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # ── Grafik 2: Distribusi RSI ──────────────────────────────────
     st.subheader("Distribusi RSI")
 
     col_a, col_b = st.columns([3, 2])
@@ -382,25 +428,19 @@ if halaman == HALAMAN_EDA:
             Pertimbangkan untuk <b>Jual</b>.
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("**Statistik RSI**")
-        st.dataframe(
-            df_rsi['RSI'].describe().round(2).rename('Nilai'),
-            use_container_width=True
-        )
+
+    st.markdown("**Statistik RSI**")
+    st.dataframe(
+        df_rsi['RSI'].describe().round(2).rename('Nilai'),
+        use_container_width=True
+    )
 
     st.markdown("---")
 
-    # ── Grafik 3: Distribusi Final Signal ────────────────────────
     st.subheader("Distribusi Final Signal")
 
-    signal_order  = ['Strong Buy', 'Buy', 'Hold', 'Sell', 'Strong Sell']
-    signal_colors = {
-        'Strong Buy':  '#166534',
-        'Buy':         '#22c55e',
-        'Hold':        '#94a3b8',
-        'Sell':        '#ef4444',
-        'Strong Sell': '#7f1d1d'
-    }
+    signal_order = SIGNAL_ORDER
+    signal_colors = SIGNAL_COLORS
     signal_counts = (df_saham['Final_Signal']
                      .value_counts()
                      .reindex(signal_order, fill_value=0)
@@ -434,7 +474,7 @@ if halaman == HALAMAN_EDA:
             st.markdown(f"""
             <div style='display:flex; justify-content:space-between;
                         align-items:center; padding:10px 14px; margin:4px 0;
-                        border-radius:8px; background:#f8fafc;
+                        border-radius:8px; background:#f8fafc; border: 1px solid #e2e8f0;
                         border-left:3px solid {color}'>
                 <span style='font-weight:500; font-size:0.85rem;
                              color:#374151'>{row['Sinyal']}</span>
@@ -484,11 +524,7 @@ elif halaman == HALAMAN_SENTIMEN:
         KOLOM_SENTIMEN = 'sentimen'
         KOLOM_JUDUL    = 'judul'
         KOLOM_TANGGAL  = 'tanggal'
-        color_sent = {
-            'positif': '#22c55e',
-            'netral':  '#94a3b8',
-            'negatif': '#ef4444'
-        }
+        color_sent = SENTIMENT_COLORS
 
         c1, c2, c3 = st.columns(3)
         c1.metric("Total Berita",
@@ -586,11 +622,10 @@ elif halaman == HALAMAN_SENTIMEN:
 
         st.markdown("---")
         st.caption(
-            "Sumber: Dataset Berita Finansial  "
+            "Sumber: Dataset-CNBCI-Sentimented  "
             "·  Periode: Jan 2024 – Mar 2025  ·  CC26-PSU256"
         )
 
-#Halaman 3: Hasil A/B Testing
 elif halaman == HALAMAN_AB:
 
     st.title("Hasil A/B Testing")
@@ -622,7 +657,6 @@ elif halaman == HALAMAN_AB:
 
     st.markdown("---")
 
-    # ── Grouped bar chart ──────────────────────────────────────
     st.subheader("Perbandingan Distribusi Sinyal")
 
     signal_order = ['Strong Buy', 'Buy', 'Hold', 'Sell', 'Strong Sell']
@@ -669,7 +703,6 @@ elif halaman == HALAMAN_AB:
 
     st.markdown("---")
 
-    # ── Uji statistik ──────────────────────────────────────────
     st.subheader("Hasil Uji Statistik")
 
     col_g, col_h = st.columns(2)
@@ -732,15 +765,12 @@ elif halaman == HALAMAN_AB:
         else:
             st.markdown("""
             <div class='box box-red'>
-            Sinyal RSI+MA belum terbukti lebih baik dari tebak-tebakan. 
-            Ini memperkuat kebutuhan akan sentimen berita pada Grup B.
+            Sinyal RSI+MA belum terbukti lebih baik dari tebak-tebakan acak secara statistik.
             </div>""", unsafe_allow_html=True)
 
     with col_h:
         st.markdown("**Grup B — Chi-Square Test**")
-        st.markdown(
-            "Menguji apakah penambahan sentimen berita mengubah "
-            "pola distribusi sinyal rekomendasi secara signifikan."
+        st.markdown("Menguji apakah sentimen berita mengubah pola sinyal secara signifikan."
         )
         tabel    = pd.crosstab(df_grup_b['Signal_B'],
                                df_grup_b['Final_Signal'])
@@ -797,10 +827,9 @@ elif halaman == HALAMAN_AB:
 
     st.markdown("---")
 
-    # ── Kesimpulan ─────────────────────────────────────────────
     st.subheader("Kesimpulan Akhir")
     st.markdown(f"""
-    <div style='background:#f8fafc; border:1px solid #e2e8f0;
+    <div style='background:#ffffff; border:1px solid #e2e8f0;
                 border-radius:12px; padding:28px'>
         <table style='width:100%; border-collapse:collapse;
                       font-size:0.875rem; margin-bottom:20px'>
@@ -876,5 +905,3 @@ elif halaman == HALAMAN_AB:
     st.caption(
         "Coding Camp 2026 powered by DBS Foundation  ·  CC26-PSU256"
     )
-
-
